@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import { Task } from "../contexts/TaskContext";
+import { Task } from "../types/tasks";
 import CoinAmount from "./ui/CoinAmount";
 import { ExternalLink, Clock } from "lucide-react";
 
@@ -9,6 +9,7 @@ interface TaskCardProps {
 }
 
 const TaskCard = ({ task }: TaskCardProps) => {
+  // Define category styles
   const categoryIcons: Record<string, string> = {
     apps: "bg-rewario-lightBlue",
     surveys: "bg-rewario-lightGreen",
@@ -35,7 +36,7 @@ const TaskCard = ({ task }: TaskCardProps) => {
               </div>
             </div>
           </div>
-          <CoinAmount amount={task.reward} size="md" />
+          <CoinAmount amount={task.coinValue} size="md" />
         </div>
         
         <div className="flex justify-between items-center mt-3">
@@ -43,10 +44,13 @@ const TaskCard = ({ task }: TaskCardProps) => {
             {task.category.charAt(0).toUpperCase() + task.category.slice(1)}
           </span>
           
-          <button className="flex items-center text-xs font-medium text-rewario-purple">
-            <span>View Task</span>
-            <ExternalLink size={14} className="ml-1" />
-          </button>
+          <div className="flex items-center">
+            <span className="text-xs text-gray-500 mr-2">₹{task.rewardInr}</span>
+            <button className="flex items-center text-xs font-medium text-rewario-purple">
+              <span>View Task</span>
+              <ExternalLink size={14} className="ml-1" />
+            </button>
+          </div>
         </div>
       </div>
     </Link>

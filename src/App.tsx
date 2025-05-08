@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import TaskDetail from "./pages/TaskDetail";
+import TaskCategory from "./pages/TaskCategory";
 import Wallet from "./pages/Wallet";
 import Referral from "./pages/Referral";
 import Levels from "./pages/Levels";
@@ -57,6 +58,7 @@ const App = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/task/:id" element={<TaskDetail />} />
+                <Route path="/category/:category" element={<TaskCategory />} />
                 <Route path="/wallet" element={<Wallet />} />
                 <Route path="/referral" element={<Referral />} />
                 <Route path="/levels" element={<Levels />} />

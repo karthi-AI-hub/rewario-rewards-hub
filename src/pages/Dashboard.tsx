@@ -1,29 +1,28 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "../contexts/UserContext";
-import { useTask } from "../contexts/TaskContext";
 import { useNavigate } from "react-router-dom";
 import BottomNav from "../components/layout/BottomNav";
 import TaskCard from "../components/TaskCard";
 import CoinAmount from "../components/ui/CoinAmount";
 import { Search, ChevronRight, User } from "lucide-react";
+import { Task } from "../types/tasks";
+import { fetchTasks } from "../services/taskService";
+import { useQuery } from "@tanstack/react-query";
 
 const Dashboard = () => {
   const { user, isAuthenticated } = useUser();
-  const { tasks, filterTasks } = useTask();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [filteredTasks, setFilteredTasks] = useState(tasks);
   const [searchQuery, setSearchQuery] = useState("");
 
   const categories = [
     { id: "all", name: "All" },
-    { id: "apps", name: "Apps" },
+    { id: "apps", name: "App Installs" },
     { id: "surveys", name: "Surveys" },
-    { id: "ads", name: "Ads" },
+    { id: "ads", name: "Video Ads" },
     { id: "games", name: "Games" },
-    { id: "offers", name: "Offers" },
-    { id: "referrals", name: "Referrals" },
+    { id: "offers", name: "Affiliate" },
   ];
 
   useEffect(() => {
@@ -32,18 +31,19 @@ const Dashboard = () => {
     }
   }, [isAuthenticated, navigate]);
 
-  useEffect(() => {
-    const filtered = filterTasks(selectedCategory === "all" ? undefined : selectedCategory);
-    
-    if (searchQuery) {
-      setFilteredTasks(filtered.filter(task => 
+  // Use React Query to fetch tasks
+  const { data: tasksResponse, isLoading, error } = useQuery({
+    queryKey: ['tasks', selectedCategory],
+    queryFn: () => fetchTasks(selectedCategory === 'all' ? undefined : selectedCategory),
+  });
+
+  // Filter tasks based on search query
+  const filteredTasks = searchQuery && tasksResponse?.tasks 
+    ? tasksResponse.tasks.filter(task => 
         task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         task.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ));
-    } else {
-      setFilteredTasks(filtered);
-    }
-  }, [selectedCategory, tasks, filterTasks, searchQuery]);
+      )
+    : tasksResponse?.tasks || [];
 
   if (!user) {
     return null; // Redirect happens in useEffect
@@ -130,8 +130,16 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {filteredTasks.length > 0 ? (
-          filteredTasks.map((task) => (
+        {isLoading ? (
+          <div className="text-center py-8 bg-white rounded-xl">
+            <p className="text-gray-500">Loading tasks...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-8 bg-white rounded-xl">
+            <p className="text-gray-500">Error loading tasks. Please try again.</p>
+          </div>
+        ) : filteredTasks.length > 0 ? (
+          filteredTasks.map((task: Task) => (
             <TaskCard key={task.id} task={task} />
           ))
         ) : (
