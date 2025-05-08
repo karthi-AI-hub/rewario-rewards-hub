@@ -1,27 +1,74 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { useState, useEffect } from "react";
+
+// Pages
+import Welcome from "./pages/Welcome";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import TaskDetail from "./pages/TaskDetail";
+import Wallet from "./pages/Wallet";
+import Referral from "./pages/Referral";
+import Levels from "./pages/Levels";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+
+// Context
+import { UserProvider } from "./contexts/UserContext";
+import { TaskProvider } from "./contexts/TaskContext";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  // Check if user has seen onboarding
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
+
+  useEffect(() => {
+    const onboardingStatus = localStorage.getItem("hasSeenOnboarding");
+    if (onboardingStatus === "true") {
+      setHasSeenOnboarding(true);
+    }
+  }, []);
+
+  const markOnboardingAsSeen = () => {
+    localStorage.setItem("hasSeenOnboarding", "true");
+    setHasSeenOnboarding(true);
+  };
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <UserProvider>
+        <TaskProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route 
+                  path="/" 
+                  element={hasSeenOnboarding ? <Login /> : <Welcome onComplete={markOnboardingAsSeen} />} 
+                />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/task/:id" element={<TaskDetail />} />
+                <Route path="/wallet" element={<Wallet />} />
+                <Route path="/referral" element={<Referral />} />
+                <Route path="/levels" element={<Levels />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </TaskProvider>
+      </UserProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
