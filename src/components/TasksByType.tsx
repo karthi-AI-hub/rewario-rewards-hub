@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Task } from "../types/tasks";
 import TaskCard from "./TaskCard";
-import { AppWindow, Survey, Video, Gamepad, Link as LinkIcon } from "lucide-react";
+import { AppWindow, ClipboardList, Video, Gamepad, Link as LinkIcon } from "lucide-react";
 
 interface TasksByTypeProps {
   tasks: Task[];
@@ -22,7 +22,7 @@ const TasksByType = ({ tasks, title, type }: TasksByTypeProps) => {
       case 'app_install':
         return <AppWindow size={20} className="mr-2 text-rewario-blue" />;
       case 'survey':
-        return <Survey size={20} className="mr-2 text-rewario-green" />;
+        return <ClipboardList size={20} className="mr-2 text-rewario-green" />;
       case 'video_ad':
         return <Video size={20} className="mr-2 text-rewario-yellow" />;
       case 'game':

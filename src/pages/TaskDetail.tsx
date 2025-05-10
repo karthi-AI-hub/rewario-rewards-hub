@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
-import { ArrowLeft, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import { ArrowLeft, Clock, CheckCircle, AlertCircle, Star, TrendingUp, DollarSign } from "lucide-react";
 import CoinAmount from "../components/ui/CoinAmount";
 import { toast } from "sonner";
 import { fetchTaskById, completeTask } from "../services/taskService";
@@ -60,7 +60,7 @@ const TaskDetail = () => {
         completedTasks: user.completedTasks + 1
       });
       
-      // Show success message
+      // Show success message with animation
       toast.success("Task completed! Coins added to your wallet.", {
         description: `+${task.coinValue} coins`,
       });
@@ -97,18 +97,43 @@ const TaskDetail = () => {
     );
   }
 
+  // Determine background color based on task type
+  const getBgColor = () => {
+    switch (task.type) {
+      case 'app_install': return 'bg-rewario-lightBlue';
+      case 'survey': return 'bg-rewario-lightGreen';
+      case 'video_ad': return 'bg-rewario-lightYellow';
+      case 'game': return 'bg-rewario-lightPurple';
+      case 'affiliate': return 'bg-rewario-lightPeach';
+      default: return 'bg-white';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pb-6">
-      {/* Header */}
-      <div className="bg-white p-6">
+      {/* Header with dynamic background */}
+      <div className={`${getBgColor()} p-6`}>
         <div className="flex items-center mb-4">
           <button
-            onClick={() => navigate("/dashboard")}
-            className="p-2 rounded-full bg-gray-100 mr-4"
+            onClick={() => navigate(-1)}
+            className="p-2 rounded-full bg-white/80 mr-4"
           >
             <ArrowLeft size={18} />
           </button>
           <h1 className="text-xl font-bold">Task Details</h1>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <span className="text-sm px-3 py-1 bg-white rounded-full text-gray-600 border border-gray-200">
+            {task.type.replace('_', ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+          </span>
+          
+          {task.minLevel && task.minLevel > 1 && (
+            <span className="text-sm px-3 py-1 bg-white rounded-full text-gray-600 border border-gray-200 flex items-center">
+              <Star size={14} className="mr-1 text-rewario-yellow" fill="#FFCC4D" />
+              Level {task.minLevel}+
+            </span>
+          )}
         </div>
       </div>
       
@@ -126,16 +151,54 @@ const TaskDetail = () => {
             <CoinAmount amount={task.coinValue} size="lg" className="bg-rewario-lightYellow px-3 py-1 rounded-full" />
           </div>
           
+          {/* Reward Info */}
+          <div className="p-3 bg-gray-50 rounded-lg mb-4">
+            <h3 className="font-medium mb-3">Rewards</h3>
+            <div className="flex justify-between mb-2">
+              <div className="flex items-center">
+                <DollarSign size={16} className="text-green-600 mr-2" />
+                <span>Cash Value</span>
+              </div>
+              <span className="font-medium">₹{task.rewardInr}</span>
+            </div>
+            <div className="flex justify-between">
+              <div className="flex items-center">
+                <CoinAmount amount={0} size="sm" />
+                <span className="ml-1">Coin Value</span>
+              </div>
+              <span className="font-medium">{task.coinValue} coins</span>
+            </div>
+            
+            {/* Conversion rate info */}
+            <div className="mt-3 pt-3 border-t border-gray-200">
+              <div className="flex items-center text-xs text-gray-500">
+                <TrendingUp size={12} className="mr-1" />
+                <span>Conversion Rate: 80% of cash value</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Partner info */}
           <div className="p-3 bg-gray-50 rounded-lg mb-4">
             <h3 className="font-medium mb-2">Partner</h3>
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gray-200 rounded-full mr-3 flex items-center justify-center">
-                  <span className="font-bold">{task.partner.name.charAt(0)}</span>
+                  {task.partner.logo ? (
+                    <img 
+                      src={task.partner.logo} 
+                      alt={task.partner.name} 
+                      className="w-6 h-6 object-contain"
+                    />
+                  ) : (
+                    <span className="font-bold">{task.partner.name.charAt(0)}</span>
+                  )}
                 </div>
-                <span>{task.partner.name}</span>
+                <div>
+                  <span>{task.partner.name}</span>
+                  <p className="text-xs text-gray-500">{task.partner.type === 'offerwall' ? 'Offerwall Partner' : 'Direct Partner'}</p>
+                </div>
               </div>
-              <div className="text-sm text-gray-500">₹{task.rewardInr}</div>
             </div>
           </div>
           

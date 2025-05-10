@@ -18,6 +18,8 @@ import Referral from "./pages/Referral";
 import Levels from "./pages/Levels";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Offerwalls from "./pages/Offerwalls";
+import OfferwallDetails from "./pages/OfferwallDetails";
 
 // Context
 import { UserProvider } from "./contexts/UserContext";
@@ -63,6 +65,8 @@ const App = () => {
                 <Route path="/referral" element={<Referral />} />
                 <Route path="/levels" element={<Levels />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/offerwalls" element={<Offerwalls />} />
+                <Route path="/offerwall/:offerwallId" element={<OfferwallDetails />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
